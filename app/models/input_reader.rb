@@ -1,51 +1,66 @@
 class InputReader
-  # Legge il file di input da path predefinito e restituisce i dati necessari per il game of life
-  def self.read
-    generation_number = 0
-    rows = cols = 0
-    grid = []
-    file_name = 'public/input.txt'
+  attr_reader :generation, :grid_size, :grid_state
 
+  # Legge il file di input da path predefinito e restituisce i dati necessari per il Game of Life
+  def initialize(file_path)
+    @file_path = file_path
+    @generation = nil
+    @grid_size = nil
+    @grid_state = []
+    read_input_file
+  end
+
+  def read_input_file
     # Verifica se il file esiste
-    unless File.exist?(file_name)
-      raise "Errore: File non trovato - '#{file_name}'"
+    unless File.exist?(@file_path)
+      raise "Errore: File non trovato per il path '#{@file_path}'"
     end
 
-    File.open(file_name, 'r') do |file|
-      # Legge e valida la riga della generazione
-      generation_line = file.readline.strip
-      unless generation_line.match?(/^Generation \d+:$/)
-        raise "Errore: formato della riga della generazione non valido (esempio corretto: 'Generation 3:')"
-      end
-      # Estrae il numero della generazione
-      generation_number = generation_line.split[1].to_i
+    # Legge tutte le righe del file, rimuovendo gli spazi vuoti e restituisce un array
+    file_lines = File.readlines(@file_path).map(&:strip)
 
-      # Legge e valida la riga della dimensione della griglia
-      grid_size_line = file.readline.strip
-      unless grid_size_line.match?(/^\d+ \d+$/)
-        raise "Errore: formato della riga dimensioni della griglia non valido (esempio corretto: '4 8')"
-      end
-      # Estrae righe e colonne
-      rows, cols = grid_size_line.split.map(&:to_i)
+    # Verifica che il formato del file sia valido
+    validate_file_format(file_lines)
 
-      # Legge e valida la griglia
-      grid = []
-      file.each_line do |line|
-        line = line.strip
-        if line.length != cols
-          raise "Errore: griglia con numero di colonne non corretto. Colonne dichiarate: #{cols}, Colonne trovate: #{line.length}"
-        end
-        unless line.match?(/^[\*\.\s]*$/)
-          raise "Errore: griglia contiene caratteri non validi (solo '*' e '.' sono ammessi)"
-        end
-        grid << line.chars
-      end
+    # Estrae la generazione iniziale e le dimensioni della griglia
+    @generation = extract_generation(file_lines[0])
+    @grid_size = extract_grid_size(file_lines[1])
+    @grid_state = file_lines[2..-1]
 
-      if grid.length != rows
-        raise "Errore: griglia con numero di righe non corretto. Righe dichiarate: #{rows}, Righe trovate: #{grid.length}"
-      end
+    # Verifica che la griglia abbia il numero corretto di righe e colonne
+    validate_grid_size
+  end
+
+  private
+
+  def validate_file_format(file_lines)
+    # Controlla che il file contenga almeno 3 righe
+    raise "Errore: Il file deve contenere almeno 3 righe" if file_lines.length < 3
+    # La prima riga deve contenere 'Generation X:'
+    raise "Errore: La prima riga deve contenere la generazione (esempio: 'Generation 3:')" unless file_lines[0].match?(/^Generation \d+:/)
+    # La seconda riga deve contenere le dimensioni della griglia (es. "4 8")
+    raise "Errore: La seconda riga deve contenere le dimensioni della griglia (esempio: '4 8')" unless file_lines[1].match?(/^\d+\s+\d+$/)
+    # Le righe successive devono contenere solo '.' e '*'
+    file_lines[2..-1].each { |line| raise "Errore: Griglia non valida" unless line.match?(/^[.*]+$/) }
+  end
+
+  def validate_grid_size
+    total_rows, total_cols = @grid_size
+    # Verifica il numero di righe nella griglia
+    raise "Errore: Il numero di righe nella griglia non corrisponde a quello specificato" if @grid_state.length != total_rows
+    # Verifica il numero di colonne in ogni riga
+    @grid_state.each do |row|
+      raise "Errore: Ogni riga della griglia deve avere #{total_cols} colonne" if row.length != total_cols
     end
+  end
 
-    return generation_number, rows, cols, grid
+  def extract_generation(generation_line)
+    # Estrae il numero di generazione dalla prima riga
+    generation_line.match(/^Generation (\d+):/)[1].to_i
+  end
+
+  def extract_grid_size(grid_size_line)
+    # Estrae le dimensioni della griglia dalla seconda riga
+    grid_size_line.split.map(&:to_i)
   end
 end
