@@ -1,63 +1,89 @@
 class Grid
-  def initialize(rows, cols, initial_state)
+  attr_reader :grid, :rows, :cols
+
+  # Inizializza la griglia con il numero di righe e colonne e lo stato iniziale
+  def initialize(rows, cols, grid_state)
     @rows = rows
     @cols = cols
-    # Inizializza una matrice vuota di celle (false = morta, true = viva)
-    @cells = Array.new(rows) { Array.new(cols, false) }
-    # Popola la griglia con lo stato iniziale
-    populate_grid(initial_state)
+    @grid = populate_grid(grid_state)
   end
 
-  def populate_grid(initial_state)
-    initial_state.each_with_index do |row, r_index|
+  # Metodo per creare la griglia partendo dallo stato iniziale
+  def populate_grid(grid_state)
+    # Inizializza una matrice con tutte le celle settate a false (false = morta, true = viva)
+    grid = Array.new(@rows) { Array.new(@cols, false) }
+    # Popola la griglia in base allo stato iniziale (con '*' e '.')
+    grid_state.each_with_index do |row, r_index|
       row.chars.each_with_index do |char, c_index|
-        @cells[r_index][c_index] = (char == '*')
-      end
-    end
-  end
-
-  # Metodo che converte la griglia in una stringa leggibile
-  def to_s
-    # Ritorna la griglia sotto forma di stringa, con '*' per le celle vive e '.' per quelle morte
-    @cells.map { |row| row.map { |cell| cell ? '*' : '.' }.join }.join("\n")
-  end
-
-  def next_generation
-    # Crea una nuova matrice per la generazione successiva
-    new_cells = Array.new(@rows) { Array.new(@cols, false) }
-
-    # Itera su tutte le celle per calcolare la generazione successiva
-    @rows.times do |r|
-      @cols.times do |c|
-        live_neighbors = live_neighbors_count(r, c)
-
-        # Regole di Conway
-        if @cells[r][c]  # Cellula viva
-          new_cells[r][c] = (live_neighbors == 2 || live_neighbors == 3)
-        else  # Cellula morta
-          new_cells[r][c] = (live_neighbors == 3)
+        # Se il carattere è '*' (vivo), mettiamo 'true' nella griglia, altrimenti 'false'
+        if char == '*'
+          grid[r_index][c_index] = true
+        else
+          grid[r_index][c_index] = false
         end
       end
     end
-
-    # Aggiorna la griglia con la nuova generazione
-    @cells = new_cells
+    grid
   end
 
-  private
+  # Metodo per visualizzare la griglia in formato stringa
+  def to_s
+    result = ""
+    # Per ogni riga della griglia
+    @grid.each do |row|
+      # Per ogni cella della riga, aggiungiamo '*' se la cella è true (viva), altrimenti '.'
+      row.each { |cell| result += cell ? '*' : '.' }
+      result += "\n"
+    end
+    # Ripulisco l'ultima riga per farla rimanere vuota
+    result.chomp
+  end
 
+  # Conta i vicini vivi di una cella
   def live_neighbors_count(row, col)
-    # Calcola il numero di celle vive intorno alla cella (row, col)
-    offsets = [-1, 0, 1].repeated_permutation(2).to_a - [[0, 0]]
-    live_count = 0
+    directions = [
+      [-1, -1], [-1, 0], [-1, 1],  # Riga sopra
+      [0, -1],          [0, 1],    # Sinistra e destra
+      [1, -1], [1, 0], [1, 1]      # Riga sotto
+    ]
 
-    offsets.each do |r_offset, c_offset|
+    # Conta quante volte la condizione è vera e restituisce quel numero (numero di vicini vivi)
+    directions.count do |r_offset, c_offset|
+      # Calcoliamo la posizione del vicino aggiungendo gli offset alla cella corrente
       r, c = row + r_offset, col + c_offset
-      if r >= 0 && r < @rows && c >= 0 && c < @cols && @cells[r][c]
-        live_count += 1
+      # Verifichiamo se il vicino è dentro i limiti della griglia
+      # E se è vivo (ossia se la cella in quella posizione è true)
+      r.between?(0, @rows - 1) && c.between?(0, @cols - 1) && @grid[r][c]
+    end
+  end
+
+  # Calcola la successiva generazione della griglia
+  def next_generation
+    # Inizializza una matrice con tutte le celle settate a false (false = morta, true = viva)
+    new_grid = Array.new(@rows) { Array.new(@cols, false) }
+    # Esamina ogni cella della griglia
+    @rows.times do |row|
+      @cols.times do |col|
+        # Conta il numero di vicini vivi
+        live_neighbors = live_neighbors_count(row, col)
+        if @grid[row][col]  # La cella è viva
+          # Regola 1: Una cella viva con meno di 2 vicini vivi muore
+          # Regola 3: Una cella viva con più di 3 vicini vivi muore
+          if live_neighbors < 2 || live_neighbors > 3
+            new_grid[row][col] = false  # La cella muore
+          else
+            # Regola 2: Una cella viva con 2 o 3 vicini vivi sopravvive
+            new_grid[row][col] = true  # La cella sopravvive
+          end
+        else  # La cella è morta
+          # Regola 4: Una cella morta con esattamente 3 vicini vivi diventa viva
+          if live_neighbors == 3
+            new_grid[row][col] = true  # La cella diventa viva
+          end
+        end
       end
     end
-
-    live_count
+    # Sostituisci la griglia attuale con la nuova griglia
+    @grid = new_grid
   end
 end

@@ -10,11 +10,9 @@ class ExtendiGameOfLife
     @generation += 1
     @grid.next_generation  # Calcola la prossima generazione
 
-    # Pulisce la console (in base al sistema operativo)
+    # Pulisce la console, in questo caso lanciando il comando 'clear' (in base al sistema operativo)
     system('clear')  # Su Windows usa 'cls'
-
-    # Mostra la generazione
-    puts "Generation #{@generation}:"
+    puts "Generation #{@generation}:"  # Mostra la generazione
     puts @grid.to_s  # Visualizza la griglia sotto forma di stringa
   end
 
