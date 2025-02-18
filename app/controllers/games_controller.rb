@@ -7,13 +7,24 @@ class GamesController < ApplicationController
 
   def create
     @game = Game.new(game_params)
-    if @game.save
-      flash[:alert] = "Gioco creato con successo!"
-      redirect_to root_path
-    else
-      flash[:alert] = "Errore nella creazione del gioco. Riprova."
-      render :new
+    begin
+      if @game.save
+        input_reader = InputReader.new(@game.input_file)
+        input_reader.read_input_file
+        flash[:notice] = "Gioco creato con successo!"
+        redirect_to game_path(@game)
+      else
+        flash[:alert] = "Errore nella creazione del gioco. Riprova"
+        redirect_to new_game_path
+      end
+    rescue StandardError => e
+      flash[:alert] = e
+      redirect_to new_game_path
     end
+  end
+
+  def show
+    @game = Game.find(params[:id])
   end
 
   private

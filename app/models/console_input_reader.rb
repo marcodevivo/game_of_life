@@ -1,22 +1,23 @@
-class InputReader
+class ConsoleInputReader
   attr_reader :generation, :grid_size, :grid_state
 
   # Legge il file di input da path predefinito e restituisce i dati necessari per il Game of Life
-  def initialize(file)
-    @file = file
+  def initialize(file_path)
+    @file_path = file_path
     @generation = nil
     @grid_size = nil
     @grid_state = []
+    read_input_file
   end
 
   def read_input_file
     # Verifica se il file esiste
-    unless @file.attached?
-      raise StandardError, "Errore: File non presente"
+    unless File.exist?(@file_path)
+      raise StandardError, "Errore: File non trovato per il path '#{@file_path}'"
     end
 
     # Legge tutte le righe del file, rimuovendo gli spazi vuoti e restituisce un array
-    file_lines = @file.blob.open { |file| File.readlines(file).map(&:strip) }
+    file_lines = File.readlines(@file_path).map(&:strip)
 
     # Verifica che il formato del file sia valido
     validate_file_format(file_lines)
