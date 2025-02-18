@@ -1,4 +1,4 @@
-class ExtendiGameOfLife
+class ConsoleGameOfLife
   def initialize(input_reader)
     @generation = input_reader.generation
     @rows, @cols = input_reader.grid_size

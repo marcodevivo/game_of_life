@@ -11,6 +11,6 @@ Rails.application.routes.draw do
   }
 
   authenticated :user do
-    get 'upload', to: 'game_of_life#upload'
+    resources :games, only: [:new, :create]
   end
 end
