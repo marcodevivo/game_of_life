@@ -6,4 +6,5 @@ if User.all.empty?
 end
 
 # ActionCable Command
+#ActionCable.server.config.allowed_request_origins = ['http://localhost:3000']
 #ActionCable.server.broadcast("game_of_life", { grid: "New Grid!" })

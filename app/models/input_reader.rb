@@ -1,7 +1,6 @@
 class InputReader
   attr_reader :generation, :grid_size, :grid_state
 
-  # Legge il file di input da path predefinito e restituisce i dati necessari per il Game of Life
   def initialize(file)
     @file = file
     @generation = nil
@@ -9,14 +8,17 @@ class InputReader
     @grid_state = []
   end
 
-  def read_input_file
-    # Verifica se il file esiste
-    unless @file.attached?
-      raise StandardError, "Errore: File non presente"
-    end
+  # Legge il file di input e lo valida
+  def read_and_validate
+    # Verifica la presenza del file
+    raise StandardError, "Errore: File non presente" unless @file.present?
 
     # Legge tutte le righe del file, rimuovendo gli spazi vuoti e restituisce un array
-    file_lines = @file.blob.open { |file| File.readlines(file).map(&:strip) }
+    if @file.is_a?(ActionDispatch::Http::UploadedFile)
+      file_lines = File.readlines(@file).map(&:strip)
+    else
+      file_lines = @file.blob.open { |file| File.readlines(file).map(&:strip) }
+    end
 
     # Verifica che il formato del file sia valido
     validate_file_format(file_lines)
@@ -40,17 +42,7 @@ class InputReader
     # La seconda riga deve contenere le dimensioni della griglia (es. "4 8")
     raise StandardError, "Errore: La seconda riga deve contenere le dimensioni della griglia (esempio: '4 8')" unless file_lines[1].match?(/^\d+\s+\d+$/)
     # Le righe successive devono contenere solo '.' e '*'
-    file_lines[2..-1].each { |line| raise "Errore: Griglia non valida" unless line.match?(/^[.*]+$/) }
-  end
-
-  def validate_grid_size
-    total_rows, total_cols = @grid_size
-    # Verifica il numero di righe nella griglia
-    raise StandardError, "Errore: Il numero di righe nella griglia non corrisponde a quello specificato" if @grid_state.length != total_rows
-    # Verifica il numero di colonne in ogni riga
-    @grid_state.each do |row|
-      raise StandardError, "Errore: Ogni riga della griglia deve avere #{total_cols} colonne" if row.length != total_cols
-    end
+    file_lines[2..-1].each { |line| raise "Errore: La griglia contiene caratteri diversi da . (cellula morta) oppure * (cellula viva)" unless line.match?(/^[.*]+$/) }
   end
 
   def extract_generation(generation_line)
@@ -62,4 +54,15 @@ class InputReader
     # Estrae le dimensioni della griglia dalla seconda riga
     grid_size_line.split.map(&:to_i)
   end
+
+  def validate_grid_size
+    total_rows, total_cols = @grid_size
+    # Verifica il numero di righe nella griglia
+    raise StandardError, "Errore: Ci dovrebbero essere #{total_rows} righe nella griglia e invece ce ne sono #{@grid_state.length}" if @grid_state.length != total_rows
+    # Verifica il numero di colonne in ogni riga
+    @grid_state.each do |row|
+      raise StandardError, "Errore: Ogni riga della griglia deve avere #{total_cols} colonne" if row.length != total_cols
+    end
+  end
+
 end

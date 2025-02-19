@@ -26,37 +26,6 @@ class Grid
     grid
   end
 
-  # Metodo per visualizzare la griglia in formato stringa
-  def show_current_state
-    result = ""
-    # Per ogni riga della griglia
-    @current_state.each do |row|
-      # Per ogni cella della riga, aggiungiamo '*' se la cella è true (viva), altrimenti '.'
-      row.each { |cell| result += cell ? '*' : '.' }
-      result += "\n"
-    end
-    # Ripulisco l'ultima riga per farla rimanere vuota
-    result.chomp
-  end
-
-  # Conta i vicini vivi di una cella
-  def live_neighbors_count(row, col)
-    directions = [
-      [-1, -1], [-1, 0], [-1, 1],  # Riga sopra
-      [0, -1],          [0, 1],    # Sinistra e destra
-      [1, -1], [1, 0], [1, 1]      # Riga sotto
-    ]
-
-    # Conta quante volte la condizione è vera e restituisce quel numero (numero di vicini vivi)
-    directions.count do |r_offset, c_offset|
-      # Calcoliamo la posizione del vicino aggiungendo gli offset alla cella corrente
-      r, c = row + r_offset, col + c_offset
-      # Verifichiamo se il vicino è dentro i limiti della griglia
-      # E se è vivo (ossia se la cella in quella posizione è true)
-      r.between?(0, @rows - 1) && c.between?(0, @cols - 1) && @current_state[r][c]
-    end
-  end
-
   # Calcola la successiva generazione della griglia
   def next_generation
     # Inizializza una matrice con tutte le celle settate a false (false = morta, true = viva)
@@ -83,7 +52,38 @@ class Grid
         end
       end
     end
-    # Sostituisci la griglia attuale con la nuova griglia
+    # Sostituisce la griglia attuale con la nuova griglia
     @current_state = new_grid
+  end
+
+  # Conta i vicini vivi di una cella
+  def live_neighbors_count(row, col)
+    directions = [
+      [-1, -1], [-1, 0], [-1, 1],  # Riga sopra
+      [0, -1],          [0, 1],    # Sinistra e destra
+      [1, -1], [1, 0], [1, 1]      # Riga sotto
+    ]
+
+    # Conta quante volte la condizione è vera e restituisce quel numero (numero di vicini vivi)
+    directions.count do |r_offset, c_offset|
+      # Calcoliamo la posizione del vicino aggiungendo gli offset alla cella corrente
+      r, c = row + r_offset, col + c_offset
+      # Verifichiamo se il vicino è dentro i limiti della griglia
+      # E se è vivo (ossia se la cella in quella posizione è true)
+      r.between?(0, @rows - 1) && c.between?(0, @cols - 1) && @current_state[r][c]
+    end
+  end
+
+  # Metodo per trasformare la matrice in stringa
+  def matrix_to_string
+    result = ""
+    # Per ogni riga della griglia
+    @current_state.each do |row|
+      # Per ogni cella della riga, aggiungiamo '*' (cellula viva) se è true, altrimenti '.' (cellula morta) se è false
+      row.each { |cell| result += cell ? '*' : '.' }
+      result += "\n"
+    end
+    # Ripulisco l'ultima riga per farla rimanere vuota
+    result.chomp
   end
 end

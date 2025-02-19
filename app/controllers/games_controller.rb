@@ -8,9 +8,11 @@ class GamesController < ApplicationController
   def create
     @game = Game.new(game_params)
     begin
+      file = params[:game][:input_file]
+      input_reader = InputReader.new(file)
+      # Legge e valida il file caricato lanciando eccezione in caso di errore
+      input_reader.read_and_validate
       if @game.save
-        input_reader = InputReader.new(@game.input_file)
-        input_reader.read_input_file
         flash[:notice] = "Gioco creato con successo!"
         redirect_to game_path(@game)
       else
@@ -18,7 +20,6 @@ class GamesController < ApplicationController
         redirect_to new_game_path
       end
     rescue StandardError => e
-      @game.destroy
       flash[:alert] = e
       redirect_to new_game_path
     end
@@ -34,7 +35,8 @@ class GamesController < ApplicationController
     iterations = @game.number_of_generations
     begin
       input_reader = InputReader.new(@game.input_file)
-      input_reader.read_input_file
+      # Legge e valida il file caricato lanciando eccezione in caso di errore
+      input_reader.read_and_validate
       generation = Generation.new(input_reader)
       number_of_generation = generation.number_of_generation
       grid = generation.grid
@@ -43,7 +45,7 @@ class GamesController < ApplicationController
         sleep 1
         number_of_generation += 1
         grid.next_generation
-        ActionCable.server.broadcast("game_of_life", { number_of_generation: number_of_generation, rows: generation.rows, cols: generation.cols, grid: grid.show_current_state })
+        ActionCable.server.broadcast("game_of_life", { number_of_generation: number_of_generation, rows: generation.rows, cols: generation.cols, grid: grid.matrix_to_string })
       end
       head :ok
     rescue StandardError => e
