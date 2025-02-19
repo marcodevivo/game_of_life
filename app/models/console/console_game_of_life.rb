@@ -13,6 +13,7 @@ class Console::ConsoleGameOfLife
     # Pulisce la console, in questo caso lanciando il comando 'clear' (in base al sistema operativo)
     system('clear')  # Su Windows usa 'cls'
     puts "Generation #{@generation}:"  # Mostra la generazione
+    puts "#{@rows} #{@cols}"  # Mostra il numero di righe e di colonne
     puts @grid.to_s  # Visualizza la griglia sotto forma di stringa
   end
 

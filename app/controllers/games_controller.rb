@@ -18,6 +18,7 @@ class GamesController < ApplicationController
         redirect_to new_game_path
       end
     rescue StandardError => e
+      @game.destroy
       flash[:alert] = e
       redirect_to new_game_path
     end
@@ -25,6 +26,7 @@ class GamesController < ApplicationController
 
   def show
     @game = Game.find(params[:id])
+    @game_of_life_file = @game.input_file.download
   end
 
   private

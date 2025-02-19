@@ -40,10 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_18_081909) do
   end
 
   create_table "games", force: :cascade do |t|
-    t.integer "current_generation"
-    t.integer "rows"
-    t.integer "cols"
-    t.integer "number_of_generations", default: 0
+    t.integer "number_of_generations", default: 1
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
