@@ -1,4 +1,4 @@
-class ConsoleInputReader
+class Console::ConsoleInputReader
   attr_reader :generation, :grid_size, :grid_state
 
   # Legge il file di input da path predefinito e restituisce i dati necessari per il Game of Life

@@ -1,9 +1,9 @@
-class ConsoleGameOfLife
+class Console::ConsoleGameOfLife
   def initialize(input_reader)
     @generation = input_reader.generation
     @rows, @cols = input_reader.grid_size
     @initial_state = input_reader.grid_state
-    @grid = Grid.new(@rows, @cols, @initial_state)
+    @grid = Console::ConsoleGrid.new(@rows, @cols, @initial_state)
   end
 
   def display_next_generation

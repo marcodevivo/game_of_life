@@ -1,4 +1,4 @@
-class Grid
+class Console::ConsoleGrid
   attr_reader :grid, :rows, :cols
 
   # Inizializza la griglia con il numero di righe e colonne e lo stato iniziale
