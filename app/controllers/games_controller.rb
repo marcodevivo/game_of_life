@@ -37,15 +37,16 @@ class GamesController < ApplicationController
       input_reader = InputReader.new(@game.input_file)
       # Legge e valida il file caricato lanciando eccezione in caso di errore
       input_reader.read_and_validate
-      generation = Generation.new(input_reader)
-      number_of_generation = generation.number_of_generation
-      grid = generation.grid
+      number_of_generation = input_reader.generation
+      rows, cols = input_reader.grid_size
+      initial_state = input_reader.grid_state
+      grid = Grid.new(rows, cols, initial_state)
 
       iterations.times do |i|
         sleep 1
         number_of_generation += 1
         grid.next_generation
-        ActionCable.server.broadcast("game_of_life", { number_of_generation: number_of_generation, rows: generation.rows, cols: generation.cols, grid: grid.matrix_to_string })
+        ActionCable.server.broadcast("game_of_life", { number_of_generation: number_of_generation, rows: rows, cols: cols, grid: grid.matrix_to_string })
       end
       head :ok
     rescue StandardError => e
