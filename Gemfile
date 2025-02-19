@@ -36,6 +36,9 @@ gem "devise"
 # Use Simple Form to create forms
 gem "simple_form"
 
+# PostgreSQL
+gem 'pg'
+
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
 
