@@ -1,15 +1,14 @@
 import consumer from "./consumer";
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("turbo:load", function () {
   const gameOutput = document.getElementById("game-output");
-  console.log(gameOutput);
   if (gameOutput) {
     consumer.subscriptions.create("GameChannel", {
       connected() {
-        console.log("Connected to the GameOfLifeChannel");
+        console.log("Connected to the GameChannel");
       },
       disconnected() {
-        console.log("Disconnected from the GameOfLifeChannel");
+        console.log("Disconnected from the GameChannel");
       },
       received(data) {
         const text = `Generation ${data.number_of_generation}:\n${data.rows} ${data.cols}\n${data.grid}`;

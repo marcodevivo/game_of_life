@@ -28,13 +28,17 @@ Generation 3:
 ........
 ```
 
-The input file is called "input.txt" and is located within the project in the "public" folder
+The InputReader class will read and validate the file loaded directly from the graphic interface while the Grid class will take care of the calculation of the new generation
 
-The output will generate N subsequent generations and show the result of the matrix at each iteration in the console
+The output will generate N subsequent generations and show the result of the matrix at each iteration
 
 ## Getting started
 
-To launch the application you need to create an InputReader object to be able to read the file:
+To launch the application (metti link e altre cose) ...
+
+
+
+you need to create an InputReader object to be able to read the file:
 
 ```console
 input_reader = InputReader.new('public/input.txt')
