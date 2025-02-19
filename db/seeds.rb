@@ -5,13 +5,5 @@ if User.all.empty?
   User.create!(email: "test@example.com", password: "Password1!", password_confirmation: "Password1!")
 end
 
-# ISTRUZIONI PER LANCIARE GAME OF LIFE IN CONSOLE (legge file predefinito)
-
-=begin
-  # Crea un oggetto InputReader per leggere il file
-  input_reader = Console::ConsoleInputReader.new('public/input.txt')
-  # Crea un oggetto ConsoleGameOfLife passando il risultato di InputReader
-  game = Console::ConsoleGameOfLife.new(input_reader)
-  # Avvia il gioco per N generazioni
-  game.play_generations(25)
-=end
+# ActionCable Command
+#ActionCable.server.broadcast("game_of_life", { grid: "New Grid!" })
