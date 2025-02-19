@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   }
 
   authenticated :user do
-    resources :games, only: [:new, :create, :show]
+    resources :games, only: [:new, :create, :show] do
+      post :generate, on: :member
+    end
   end
 end

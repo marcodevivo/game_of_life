@@ -29,6 +29,29 @@ class GamesController < ApplicationController
     @game_of_life_file = @game.input_file.download
   end
 
+  def generate
+    @game = Game.find(params[:id])
+    iterations = @game.number_of_generations
+    begin
+      input_reader = InputReader.new(@game.input_file)
+      input_reader.read_input_file
+      generation = Generation.new(input_reader)
+      number_of_generation = generation.number_of_generation
+      grid = generation.grid
+
+      iterations.times do |i|
+        sleep 1
+        number_of_generation += 1
+        grid.next_generation
+        ActionCable.server.broadcast("game_of_life", { number_of_generation: number_of_generation, rows: generation.rows, cols: generation.cols, grid: grid.show_current_state })
+      end
+      head :ok
+    rescue StandardError => e
+      flash[:alert] = e
+      redirect_to game_path(@game)
+    end
+  end
+
   private
   def game_params
     params.require(:game).permit(:number_of_generations, :input_file)

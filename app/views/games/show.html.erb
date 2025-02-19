@@ -92,12 +92,12 @@
   <h1>Sei pronto?</h1>
   <p>Mettiti comodo e goditi la generazione del Gioco della Vita secondo le tue regole.</p>
 
-  <div class="game-output">
+  <div id="game-output" class="game-output">
     <h2>File Caricato</h2>
     <pre><%= @game_of_life_file %></pre>
   </div>
 
-  <%= button_to 'Avvia la generazione', '#', method: :post, class: 'btn' %>
+  <%= button_to 'Avvia la generazione', generate_game_path(@game), id: 'start-game', method: :post, class: 'btn' %>
 </div>
 
 <%= button_to 'Logout', destroy_user_session_path, method: :delete, class: 'btn' %>
