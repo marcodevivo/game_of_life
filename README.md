@@ -1,4 +1,4 @@
-# Extendi - Game Of Life
+# Game Of Life - Extendi
 
 This code is based on [Conway's Game of Life](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life)
 
@@ -34,26 +34,20 @@ The output will generate N subsequent generations and show the result of the mat
 
 ## Getting started
 
-To launch the application (metti link e altre cose) ...
-
-
-
-you need to create an InputReader object to be able to read the file:
+To launch the application you need to create a user for login, this can be done directly with the command:
 
 ```console
-input_reader = InputReader.new('public/input.txt')
+rails db:seed
 ```
 
-After that, we need to create an ExtendiGameOfLife object passing the result of InputReader:
+After that, we need to allow ActionCable to work and update the page in real time, this can be done by running the following command directly in the rails console:
 
 ```console
-game = ExtendiGameOfLife.new(input_reader)
+ActionCable.server.broadcast("game_of_life", { grid: "New Grid!" })
 ```
 
-That's it, now we are ready to run the game for N iterations:
+That's it, now we are ready to play with our application, we can start the server and watch the Game Of Life!
 
 ```console
-game.play_generations(25)
+rails s
 ```
-
-You can also find the previous commands to launch in the console in the "seeds.rb" file where they have been inserted for greater convenience
